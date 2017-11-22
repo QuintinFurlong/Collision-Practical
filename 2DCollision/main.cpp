@@ -1,5 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#define TINYC2_IMPL
+#include <tinyc2.h>
 #include <AnimatedSprite.h>
 #include <Player.h>
 #include <Input.h>
@@ -21,7 +23,7 @@ int main()
 
 	// Load a mouse texture to display
 	sf::Texture mouse_texture;
-	if (!mouse_texture.loadFromFile("assets\\grid.png")) {
+	if (!mouse_texture.loadFromFile("assets\\mouse.png")) {
 		DEBUG_MSG("Failed to load file");
 		return EXIT_FAILURE;
 	}
@@ -29,6 +31,11 @@ int main()
 	// Setup a mouse Sprite
 	sf::Sprite mouse;
 	mouse.setTexture(mouse_texture);
+
+	//Setup mouse AABB
+	c2AABB aabb_mouse;
+	aabb_mouse.min = c2V(mouse.getPosition().x, mouse.getPosition().y);
+	aabb_mouse.max = c2V(mouse.getGlobalBounds().width, mouse.getGlobalBounds().width);
 
 	// Setup Players Default Animated Sprite
 	AnimatedSprite animated_sprite(sprite_sheet);
@@ -39,15 +46,29 @@ int main()
 	animated_sprite.addFrame(sf::IntRect(343, 3, 84, 84));
 	animated_sprite.addFrame(sf::IntRect(428, 3, 84, 84));
 
+	// Setup Players AABB
+	c2AABB aabb_player;
+	aabb_player.min = c2V(animated_sprite.getPosition().x, animated_sprite.getPosition().y);
+	aabb_player.max = c2V(animated_sprite.getGlobalBounds().width / animated_sprite.getFrames().size(), 
+		animated_sprite.getGlobalBounds().height / animated_sprite.getFrames().size());
+
+
 	// Setup the Player
 	Player player(animated_sprite);
 	Input input;
+
+	// Collision result
+	int result = 0;
 	
 	// Start the game loop
 	while (window.isOpen())
 	{
 		// Move Sprite Follow Mouse
 		mouse.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+
+		// Update mouse AABB
+		aabb_mouse.min = c2V(mouse.getPosition().x, mouse.getPosition().y);
+		aabb_mouse.max = c2V(mouse.getGlobalBounds().width, mouse.getGlobalBounds().width);
 
 		// Process events
 		sf::Event event;
@@ -84,6 +105,16 @@ int main()
 
 		// Update the Player
 		player.update();
+
+		// Check for collisions
+		result = c2AABBtoAABB(aabb_mouse, aabb_player);
+		cout << ((result != 0) ? ("Collision") : "") << endl;
+		if (result){
+			player.getAnimatedSprite().setColor(sf::Color(255,0,0));
+		}
+		else {
+			player.getAnimatedSprite().setColor(sf::Color(0, 255, 0));
+		}
 
 		// Clear screen
 		window.clear();

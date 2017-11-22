@@ -1,10 +1,6 @@
 /*
 tinyc2.h - v1.03
 
-To create implementation (the function definitions)
-#define TINYC2_IMPLEMENTATION
-in *one* C/CPP file (translation unit) that includes this file
-
 SUMMARY:
 tinyc2 is a single-file header that implements 2D collision detection routines
 that test for overlap, and optionally can find the collision manifold. The
@@ -30,6 +26,12 @@ felipefs          1.02 - 3 compile bugfixes
 seemk             1.02 - fix branching bug in c2Collide
 sro5h             1.02 - bug reports for multiple manifold funcs
 sro5h             1.03 - work involving quality of life fixes for manifolds
+*/
+
+/*
+To create implementation (the function definitions)
+#define TINYC2_IMPL
+in *one* C/CPP file (translation unit) that includes this file
 */
 
 /*
@@ -406,7 +408,7 @@ C2_INLINE void c2BBVerts(c2v* out, c2AABB* bb)
 #define TINYC2_H
 #endif
 
-#ifdef TINYC2_IMPLEMENTATION
+#ifdef TINYC2_IMPL
 
 int c2Collided(const void* A, const c2x* ax, C2_TYPE typeA, const void* B, const c2x* bx, C2_TYPE typeB)
 {
@@ -1274,14 +1276,11 @@ void c2CircletoCapsuleManifold(c2Circle A, c2Capsule B, c2Manifold* m)
 	float d = c2GJK(&A, C2_CIRCLE, 0, &B, C2_CAPSULE, 0, &a, &b, 0);
 	if (d < r)
 	{
-		c2v n;
-		if (d == 0) n = c2Norm(c2Skew(c2Sub(B.b, B.a)));
-		else n = c2Norm(c2Sub(b, a));
-
 		m->count = 1;
 		m->depths[0] = r - d;
-		m->contact_points[0] = c2Sub(b, c2Mulvs(n, B.r));
-		m->normal = n;
+		m->contact_points[0] = c2Mulvs(c2Add(a, b), 0.5f);
+		if (d == 0) m->normal = c2Skew(c2Norm(c2Sub(B.b, B.a)));
+		else m->normal = c2Norm(c2Sub(b, a));
 	}
 }
 
@@ -1356,18 +1355,13 @@ void c2CapsuletoCapsuleManifold(c2Capsule A, c2Capsule B, c2Manifold* m)
 {
 	m->count = 0;
 	c2v a, b;
-	float r = A.r + B.r;
 	float d = c2GJK(&A, C2_CAPSULE, 0, &B, C2_CAPSULE, 0, &a, &b, 0);
-	if (d < r)
+	if (d < A.r + B.r)
 	{
-		c2v n;
-		if (d == 0) n = c2Norm(c2Skew(c2Sub(A.b, A.a)));
-		else n = c2Norm(c2Sub(b, a));
-
 		m->count = 1;
-		m->depths[0] = r - d;
-		m->contact_points[0] = c2Sub(b, c2Mulvs(n, B.r));
-		m->normal = n;
+		m->contact_points[0] = c2Mulvs(c2Add(a, b), 0.5f);
+		m->depths[0] = d;
+		m->normal = d != 0 ? c2Norm(c2Sub(b, a)) : c2Norm(c2Skew(c2Sub(A.b, A.a)));
 	}
 }
 
@@ -1669,7 +1663,7 @@ void c2PolytoPolyManifold(const c2Poly* A, const c2x* ax_ptr, const c2Poly* B, c
 	if (flip) m->normal = c2Neg(m->normal);
 }
 
-#endif // TINYC2_IMPLEMENTATION
+#endif // TINYC2_IMPL
 
 /*
 zlib license:

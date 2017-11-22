@@ -1,11 +1,13 @@
 # README #
 
-This is LAB 03 StarterKit. This project defines an FSM and AnimatedSprite container
+This is LAB 03-a StarterKit. This project defines a 2D Collision StarterKit
 
 
 ### What is this repository for? ###
 
-* Lab 03 Experiment with FSM and Animated Sprite to enable specific player animation transitions
+* Lab 03 a Experiment with difference collision types
+* See `https://github.com/RandyGaul/tinyheaders/`
+* See `https://github.com/sro5h/tinyc2-tests/`
 
 ### How do I get set up? ###
 
@@ -26,9 +28,9 @@ This is LAB 03 StarterKit. This project defines an FSM and AnimatedSprite contai
 
 * Change to the projects directory by `cd projects`
 
-* Clone the project `git clone https://MuddyGames@bitbucket.org/MuddyGames/gameplay-programming-i-lab03.git`
+* Clone the project `git clone https://MuddyGames@bitbucket.org/MuddyGames/gameplay-programming-i-lab03-a.git`
 
-* Change to the project directory `cd projects gameplay-programming-i-lab03`
+* Change to the project directory `cd projects gameplay-programming-i-lab03-a`
 
 * List files that were downloaded `ls`
 
