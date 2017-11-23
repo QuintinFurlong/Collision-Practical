@@ -23,10 +23,17 @@ int main()
 
 	// Load a mouse texture to display
 	sf::Texture mouse_texture;
+	sf::Texture mouse_texture1;
 	if (!mouse_texture.loadFromFile("assets\\mouse.png")) {
 		DEBUG_MSG("Failed to load file");
 		return EXIT_FAILURE;
 	}
+	if (!mouse_texture1.loadFromFile("assets\\mouse1.png")) {
+		DEBUG_MSG("Failed to load file");
+		return EXIT_FAILURE;
+	}
+
+	
 
 	// Setup a mouse Sprite
 	sf::Sprite mouse;
@@ -111,9 +118,11 @@ int main()
 		cout << ((result != 0) ? ("Collision") : "") << endl;
 		if (result){
 			player.getAnimatedSprite().setColor(sf::Color(255,0,0));
+			mouse.setTexture(mouse_texture);
 		}
 		else {
 			player.getAnimatedSprite().setColor(sf::Color(0, 255, 0));
+			mouse.setTexture(mouse_texture1);
 		}
 
 		// Clear screen

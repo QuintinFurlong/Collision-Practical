@@ -43,6 +43,9 @@
   <ItemGroup>
     <None Include="..\README.md" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\mouse1.png" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{1BC25414-4B13-438A-9D4F-B4D6C048AB52}</ProjectGuid>
