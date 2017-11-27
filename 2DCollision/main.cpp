@@ -6,6 +6,7 @@
 #include <Player.h>
 #include <Input.h>
 #include <Debug.h>
+#include "Main.h"
 
 using namespace std;
 
@@ -32,37 +33,23 @@ int main()
 		DEBUG_MSG("Failed to load file");
 		return EXIT_FAILURE;
 	}
-
-	
+	//0 = aabb 1 = circle 2 = ray
+	npcShape = 0;
+	//0 = aabb 1 = circle 2 = ray 3 = capsule 4 = polygon
+	mouseShape = 0;
 
 	// Setup a mouse Sprite
-	sf::Sprite mouse;
-	mouse.setTexture(mouse_texture);
+	aabb_mouse.setTexture(mouse_texture);
 
 	//Setup mouse AABB
-	c2AABB aabb_mouse;
-	aabb_mouse.min = c2V(mouse.getPosition().x, mouse.getPosition().y);
-	aabb_mouse.max = c2V(mouse.getGlobalBounds().width, mouse.getGlobalBounds().width);
+	aabb_mouse_info.min = c2V(aabb_mouse.getPosition().x, aabb_mouse.getPosition().y);
+	aabb_mouse_info.max = c2V(aabb_mouse.getGlobalBounds().width, aabb_mouse.getGlobalBounds().width);
 
-	// Setup Players Default Animated Sprite
-	AnimatedSprite animated_sprite(sprite_sheet);
-	animated_sprite.addFrame(sf::IntRect(3, 3, 84, 84));
-	animated_sprite.addFrame(sf::IntRect(88, 3, 84, 84));
-	animated_sprite.addFrame(sf::IntRect(173, 3, 84, 84));
-	animated_sprite.addFrame(sf::IntRect(258, 3, 84, 84));
-	animated_sprite.addFrame(sf::IntRect(343, 3, 84, 84));
-	animated_sprite.addFrame(sf::IntRect(428, 3, 84, 84));
 
 	// Setup Players AABB
-	c2AABB aabb_player;
-	aabb_player.min = c2V(animated_sprite.getPosition().x, animated_sprite.getPosition().y);
-	aabb_player.max = c2V(animated_sprite.getGlobalBounds().width / animated_sprite.getFrames().size(), 
-		animated_sprite.getGlobalBounds().height / animated_sprite.getFrames().size());
-
+	setupNpc();
 
 	// Setup the Player
-	Player player(animated_sprite);
-	Input input;
 
 	// Collision result
 	int result = 0;
@@ -71,11 +58,11 @@ int main()
 	while (window.isOpen())
 	{
 		// Move Sprite Follow Mouse
-		mouse.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+		aabb_mouse.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 
 		// Update mouse AABB
-		aabb_mouse.min = c2V(mouse.getPosition().x, mouse.getPosition().y);
-		aabb_mouse.max = c2V(mouse.getGlobalBounds().width, mouse.getGlobalBounds().width);
+		aabb_mouse_info.min = c2V(aabb_mouse.getPosition().x, aabb_mouse.getPosition().y);
+		aabb_mouse_info.max = c2V(aabb_mouse.getPosition().x + aabb_mouse.getGlobalBounds().width, aabb_mouse.getPosition().y + aabb_mouse.getGlobalBounds().width);
 
 		// Process events
 		sf::Event event;
@@ -90,47 +77,154 @@ int main()
 			case sf::Event::KeyPressed:
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
 				{
-					input.setCurrent(Input::Action::LEFT);
+					mouseShape--;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
 				{
-					input.setCurrent(Input::Action::RIGHT);
+					mouseShape++;
 				}
 				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
 				{
-					input.setCurrent(Input::Action::UP);
+					npcShape++;
+				}
+				else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+				{
+					npcShape--;
 				}
 				break;
 			default:
-				input.setCurrent(Input::Action::IDLE);
 				break;
 			}
 		}
 
-		// Handle input to Player
-		player.handleInput(input);
+		if (npcShape < 0)
+			npcShape = 2;
+		else if (npcShape > 2)
+			npcShape = 0;
 
-		// Update the Player
-		player.update();
+		if (mouseShape < 0)
+			mouseShape = 4;
+		else if (mouseShape > 4)
+			mouseShape = 0;
 
 		// Check for collisions
-		result = c2AABBtoAABB(aabb_mouse, aabb_player);
-		cout << ((result != 0) ? ("Collision") : "") << endl;
-		if (result){
-			player.getAnimatedSprite().setColor(sf::Color(255,0,0));
-			mouse.setTexture(mouse_texture);
-		}
-		else {
-			player.getAnimatedSprite().setColor(sf::Color(0, 255, 0));
-			mouse.setTexture(mouse_texture1);
+		switch (npcShape)
+		{
+		case 0:
+			switch (mouseShape)
+			{
+			case 0:
+			result = c2AABBtoAABB(aabb_npc_info, aabb_mouse_info);
+			cout << ((result != 0) ? ("Collision") : "") << endl;
+			if (result){
+				aabb_mouse.setTexture(mouse_texture);
+			}
+			else {
+				aabb_mouse.setTexture(mouse_texture1);
+			}
+			break;
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+			default:
+				break;
+			}
+			if (result) {
+				aabb_npc.setTexture(&mouse_texture);
+			}
+			else {
+				aabb_npc.setTexture(&mouse_texture1);
+			}
+		break;
+		case 1:
+			switch (mouseShape)
+			{
+			case 0:
+				result = c2CircletoAABB(circle_npc_info, aabb_mouse_info);
+				cout << ((result != 0) ? ("Collision") : "") << endl;
+				if (result) {
+					aabb_mouse.setTexture(mouse_texture);
+				}
+				else {
+					aabb_mouse.setTexture(mouse_texture1);
+				}
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+			default:
+				break;
+			}
+			if (result) {
+				circle_npc.setFillColor(sf::Color::Red);
+			}
+			else {
+				circle_npc.setFillColor(sf::Color::Green);
+			}
+			break;
+		case 2:
+			switch (mouseShape)
+			{
+			case 0:
+				result = c2AABBtoAABB(aabb_mouse_info, aabb_npc_info);
+				cout << ((result != 0) ? ("Collision") : "") << endl;
+				if (result) {
+					aabb_mouse.setTexture(mouse_texture);
+				}
+				else {
+					aabb_mouse.setTexture(mouse_texture1);
+				}
+				break;
+			case 1:
+				break;
+			case 2:
+				break;
+			case 3:
+				break;
+			case 4:
+				break;
+			default:
+				break;
+			}
+			if (result) {
+				aabb_npc.setTexture(&mouse_texture);
+			}
+			else {
+				aabb_npc.setTexture(&mouse_texture1);
+			}
+			break;
+		default:
+			break;
 		}
 
 		// Clear screen
 		window.clear();
 
-		// Draw the Players Current Animated Sprite
-		window.draw(player.getAnimatedSprite());
-		window.draw(mouse);
+		switch (npcShape)
+		{
+		case 0:
+			window.draw(aabb_npc);
+			break;
+		case 1:
+			window.draw(circle_npc);
+			break;
+		case 2:
+			window.draw(ray_npc);
+			break;
+		default:
+			break;
+		}
+		window.draw(aabb_mouse);
 
 		// Update the window
 		window.display();
@@ -138,3 +232,21 @@ int main()
 
 	return EXIT_SUCCESS;
 };
+
+void setupNpc()
+{
+	aabb_npc.setSize(sf::Vector2f(100,100));
+	aabb_npc.setPosition(sf::Vector2f(200, 200));
+	circle_npc.setRadius(50);
+	circle_npc.setPosition(sf::Vector2f(200, 200));
+	ray_npc.append(sf::Vertex(sf::Vector2f(0, 50)));
+	ray_npc.append(sf::Vertex(sf::Vector2f(100, 50)));
+
+	aabb_npc_info.min = c2V(aabb_npc.getPosition().x, aabb_npc.getPosition().y);
+	aabb_npc_info.max = c2V(aabb_npc.getPosition().x + aabb_npc.getGlobalBounds().width, aabb_npc.getPosition().y + aabb_npc.getGlobalBounds().height);
+
+	circle_npc_info.p = c2V(circle_npc.getPosition().x + circle_npc.getRadius(), circle_npc.getPosition().y + circle_npc.getRadius());
+	circle_npc_info.r = circle_npc.getRadius();
+
+	ray_npc_info.p = c2V(ray_npc[0].position.x, ray_npc[0].position.y);
+}
