@@ -117,5 +117,11 @@
     <Image Include="assets\mouse1.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\circle1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\capsule1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
