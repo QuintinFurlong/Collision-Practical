@@ -123,5 +123,8 @@
     <Image Include="assets\capsule1.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\ray1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -25,15 +25,21 @@ int main()
 	// Load a mouse texture to display
 	sf::Texture mouse_texture;
 	sf::Texture circle_texture;
+	sf::Texture ray_texture;
 	sf::Texture capsule_texture;
 	sf::Texture mouse_texture1;
 	sf::Texture circle_texture1;
+	sf::Texture ray_texture1;
 	sf::Texture capsule_texture1;
 	if (!mouse_texture.loadFromFile("assets\\mouse.png")) {
 		DEBUG_MSG("Failed to load file");
 		return EXIT_FAILURE;
 	}
 	if (!circle_texture.loadFromFile("assets\\circle.png")) {
+		DEBUG_MSG("Failed to load file");
+		return EXIT_FAILURE;
+	}
+	if (!ray_texture.loadFromFile("assets\\ray.png")) {
 		DEBUG_MSG("Failed to load file");
 		return EXIT_FAILURE;
 	}
@@ -49,6 +55,10 @@ int main()
 		DEBUG_MSG("Failed to load file");
 		return EXIT_FAILURE;
 	}
+	if (!ray_texture1.loadFromFile("assets\\ray1.png")) {
+		DEBUG_MSG("Failed to load file");
+		return EXIT_FAILURE;
+	}
 	if (!capsule_texture1.loadFromFile("assets\\capsule1.png")) {
 		DEBUG_MSG("Failed to load file");
 		return EXIT_FAILURE;
@@ -61,6 +71,7 @@ int main()
 	// Setup a mouse Sprite
 	aabb_mouse.setTexture(mouse_texture);
 	circle_mouse.setTexture(circle_texture);
+	ray_mouse.setTexture(ray_texture);
 	capsule_mouse.setTexture(capsule_texture);
 
 	//Setup mouse AABB
@@ -68,6 +79,9 @@ int main()
 	aabb_mouse_info.max = c2V(aabb_mouse.getGlobalBounds().width, aabb_mouse.getGlobalBounds().width);
 	circle_mouse_info.p = c2V(circle_mouse.getPosition().x, aabb_mouse.getPosition().y);
 	circle_mouse_info.r = circle_mouse.getGlobalBounds().width / 2;
+	ray_mouse_info.p = c2V(ray_mouse.getPosition().x, ray_mouse.getPosition().y);
+	ray_mouse_info.t = ray_mouse.getGlobalBounds().width;
+	ray_mouse_info.d = c2V((ray_mouse.getGlobalBounds().width) / ray_mouse_info.t, (ray_mouse.getGlobalBounds().height) / ray_npc_info.t);
 	capsule_mouse_info.r = capsule_mouse.getGlobalBounds().height / 2;
 	capsule_mouse_info.a = c2V(capsule_mouse.getPosition().x + capsule_mouse_info.r, capsule_mouse.getPosition().y + capsule_mouse_info.r);
 	capsule_mouse_info.b = c2V(capsule_mouse.getPosition().x + capsule_mouse.getGlobalBounds().width - capsule_mouse_info.r, capsule_mouse.getPosition().y + capsule_mouse_info.r);
@@ -86,6 +100,7 @@ int main()
 		// Move Sprite Follow Mouse
 		aabb_mouse.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 		circle_mouse.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+		ray_mouse.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 		capsule_mouse.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 
 		// Update mouse AABB
@@ -100,9 +115,12 @@ int main()
 			circle_mouse_info.p = c2V(circle_mouse.getPosition().x + circle_mouse_info.r, aabb_mouse.getPosition().y + circle_mouse_info.r);
 			break;
 		case 2:
+			ray_mouse_info.p = c2V(ray_mouse.getPosition().x, ray_mouse.getPosition().y);
+			ray_mouse_info.t = ray_mouse.getGlobalBounds().width;
+			ray_mouse_info.d = c2V((ray_mouse.getGlobalBounds().width) / ray_mouse_info.t, (ray_mouse.getGlobalBounds().height) / ray_npc_info.t);
 			break;
 		case 3:
-			capsule_mouse_info.r = capsule_mouse.getGlobalBounds().height / 3;
+			capsule_mouse_info.r = capsule_mouse.getGlobalBounds().height / 2;
 			capsule_mouse_info.a = c2V(capsule_mouse.getPosition().x + capsule_mouse_info.r, capsule_mouse.getPosition().y + capsule_mouse_info.r);
 			capsule_mouse_info.b = c2V(capsule_mouse.getPosition().x + capsule_mouse.getGlobalBounds().width - capsule_mouse_info.r, capsule_mouse.getPosition().y + capsule_mouse_info.r);
 			break;
@@ -182,6 +200,14 @@ int main()
 				}
 				break;
 			case 2:
+				result = c2RaytoAABB(ray_mouse_info, aabb_npc_info, &raycast_mouse_info);
+				cout << ((result != 0) ? ("Collision") : "") << endl;
+				if (result) {
+					ray_mouse.setTexture(ray_texture);
+				}
+				else {
+					ray_mouse.setTexture(ray_texture1);
+				}
 				break;
 			case 3:
 				result = c2AABBtoCapsule(aabb_npc_info, capsule_mouse_info);
@@ -229,8 +255,24 @@ int main()
 				}
 				break;
 			case 2:
+				result = c2RaytoCircle(ray_mouse_info, circle_npc_info, &raycast_mouse_info);
+				cout << ((result != 0) ? ("Collision") : "") << endl;
+				if (result) {
+					ray_mouse.setTexture(ray_texture);
+				}
+				else {
+					ray_mouse.setTexture(ray_texture1);
+				}
 				break;
 			case 3:
+				result = c2CircletoCapsule(circle_npc_info, capsule_mouse_info);
+				cout << ((result != 0) ? ("Collision") : "") << endl;
+				if (result) {
+					capsule_mouse.setTexture(capsule_texture);
+				}
+				else {
+					capsule_mouse.setTexture(capsule_texture1);
+				}
 				break;
 			case 4:
 				break;
@@ -268,8 +310,17 @@ int main()
 				}
 				break;
 			case 2:
+				//rays can't collid
 				break;
 			case 3:
+				result = c2RaytoCapsule(ray_npc_info, capsule_mouse_info, &raycast_npc_info);
+				cout << ((result != 0) ? ("Collision") : "") << endl;
+				if (result) {
+					capsule_mouse.setTexture(capsule_texture);
+				}
+				else {
+					capsule_mouse.setTexture(capsule_texture1);
+				}
 				break;
 			case 4:
 				break;
@@ -313,6 +364,7 @@ int main()
 			window.draw(circle_mouse);
 			break;
 		case 2:
+			window.draw(ray_mouse);
 			break;
 		case 3:
 			window.draw(capsule_mouse);

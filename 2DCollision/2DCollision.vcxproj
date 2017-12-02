@@ -48,6 +48,7 @@
     <Image Include="assets\capsule1.png" />
     <Image Include="assets\circle1.png" />
     <Image Include="assets\mouse1.png" />
+    <Image Include="assets\ray1.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

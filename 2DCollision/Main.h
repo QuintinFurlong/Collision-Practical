@@ -16,9 +16,11 @@ sf::VertexArray raycast_npc(sf::Lines);
 int mouseShape;//0 = aabb 1 = circle 2 = ray 3 = capsule 4 = polygon
 c2AABB aabb_mouse_info;
 c2Circle circle_mouse_info;
+c2Ray ray_mouse_info;
+c2Raycast raycast_mouse_info;
 c2Capsule capsule_mouse_info;
-
 
 sf::Sprite aabb_mouse;
 sf::Sprite circle_mouse;
+sf::Sprite ray_mouse;
 sf::Sprite capsule_mouse;
